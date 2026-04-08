@@ -21,16 +21,23 @@ class TestFileswitcher(unittest.TestCase):
         self.assertEqual('cpp', fs.file_extension('foo.cpp'))
         self.assertEqual('hpp', fs.file_extension('foo.hpp'))
 
+    #TODO Eero: finalize this
+    def test_find_files_in_tags(self):
+        self.assertEqual([], fs.find_files_in_tags('Foo.cpp'))
+
     @patch('vim.command')
     def test_open_file(self, mock_method):
         fs.open_file('stub/foo.cpp')
         mock_method.assert_called_with('edit stub/foo.cpp')
 
-    #@patch('vim.current.buffer.name')
     def test_get_other_file(self):
-        #mock_method.return_value = 'Foo.cpp'
-        #self.assertEqual('Foo.hpp', fs.get_other_file())
-        pass
-
+        self.assertEqual('Foo.hpp', fs.get_other_file('Foo.cpp'))
+        self.assertEqual('Foo.cpp', fs.get_other_file('Foo.hpp'))
+        self.assertEqual('Foo.h', fs.get_other_file('Foo.c'))
+        self.assertEqual('Foo.c', fs.get_other_file('Foo.h'))
+        self.assertEqual('/tmp/bar/Foo.h', fs.get_other_file('/tmp/bar/Foo.c'))
+        self.assertEqual('/tmp/bar/Foo.hpp', fs.get_other_file('/tmp/bar/Foo.cpp'))
+        with self.assertRaises(NameError):
+            fs.get_other_file('/tmp/bar/Foo.py')
 
 unittest.main()
