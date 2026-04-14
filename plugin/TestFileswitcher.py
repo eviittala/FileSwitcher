@@ -5,25 +5,46 @@ import sys
 sys.path.append('.')
 import Fileswitcher as fs
 
-class Foo:
-    name = 'Foo.cpp'
+# How to execute: py3f TestFileSwitcher.py
 
-class TestFileswitcher(unittest.TestCase):
+class TestFileSwitcher(unittest.TestCase):
 
-    def test_exists(self):
-        with open('foo.cpp', 'w') as file:
-            file.write('Hello World')
-        self.assertTrue(fs.exists('foo.cpp'))
-        os.remove('foo.cpp')
-        self.assertFalse(fs.exists('foo.cpp'))
+    #def test_exists(self):
+    #    with open('foo.cpp', 'w') as file:
+    #        file.write('Hello World')
+    #    self.assertTrue(fs.exists('foo.cpp'))
+    #    os.remove('foo.cpp')
+    #    self.assertFalse(fs.exists('foo.cpp'))
+    def tearDown(self):
+        if os.path.exists('tags'):
+            os.remove('tags')
 
     def test_file_extension(self):
         self.assertEqual('cpp', fs.file_extension('foo.cpp'))
         self.assertEqual('hpp', fs.file_extension('foo.hpp'))
 
-    #TODO Eero: finalize this
     def test_find_files_in_tags(self):
-        self.assertEqual([], fs.find_files_in_tags('Foo.cpp'))
+        self.assertEqual(set(), fs.find_files_in_tags('Foo.cpp'))
+        self.assertTrue(0 == len(fs.find_files_in_tags('Foo.cpp')))
+
+    def test_find_files_in_tags1(self):
+        with open('tags', 'w') as file:
+            file.write("Main software/bar/Foo.cpp class Foo")
+        self.assertEqual({'software/bar/Foo.cpp'}, fs.find_files_in_tags('Foo.cpp'))
+
+    def test_find_files_in_tags2(self):
+        with open('tags', 'w') as file:
+            file.write("Main    software/bar/TestFoo.cpp    class Foo\n")
+            file.write("Main    software/bar/Foo.cpp    class Foo\n")
+        self.assertEqual({'software/bar/Foo.cpp'}, fs.find_files_in_tags('software/foo/Foo.cpp'))
+
+    def test_find_files_in_tags3(self):
+        with open('tags', 'w') as file:
+            file.write("Main    software/tmp/Foo.cpp    class Foo\n")
+            file.write("Main    software/bar/TestFoo.cpp    class Foo\n")
+            file.write("Main    software/bar/Foo.cpp    class Foo\n")
+            file.write("Main    software/sys/Foo.cpp    class Foo\n")
+        self.assertEqual({'software/tmp/Foo.cpp', 'software/bar/Foo.cpp', 'software/sys/Foo.cpp'}, fs.find_files_in_tags('software/foo/Foo.cpp'))
 
     @patch('vim.command')
     def test_open_file(self, mock_method):

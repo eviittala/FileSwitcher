@@ -1,14 +1,11 @@
 import vim
 import os
 
-def exists(file):
-    return os.path.exists(file)
-
 def file_extension(path):
     return path.split('.')[-1]
 
 def find_files_in_tags(file):
-    if exists('tags'):
+    if os.path.exists('tags'):
         filename = os.path.basename(file)
         files = []
         try:
@@ -17,16 +14,16 @@ def find_files_in_tags(file):
                     #print("line: ", end="")
                     if line.find(filename) != -1:
                         txt = line.split()
-                        files.append(txt[1])
-                        break
-                        #print(txt)
+                        if os.path.basename(txt[1]) == filename:
+                            #print(f"Append {txt[1]}")
+                            files.append(txt[1])
         except (IOError, UnicodeDecodeError) as e:
             pass
         
         return set(files)
     else:
-        print("tags -file is not found")
-    return []
+        print("tags -file is not found s")
+    return set()
 
 def open_file(path):
     cmd = 'edit ' + path
@@ -46,7 +43,7 @@ def get_other_file(filename):
 if __name__ == "__main__":
     try:
         other_file = get_other_file(vim.current.buffer.name)
-        if exists(other):
+        if os.path.exists(other):
             open_file(other_file)
         else:
             files = find_files_in_tags(other_file)
