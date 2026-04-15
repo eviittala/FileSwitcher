@@ -3,7 +3,7 @@ from unittest.mock import patch
 import os
 import sys
 sys.path.append('.')
-import Fileswitcher as fs
+import FileSwitcher as fs
 
 # How to execute: py3f TestFileSwitcher.py
 
