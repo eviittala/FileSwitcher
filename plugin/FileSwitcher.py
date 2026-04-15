@@ -40,10 +40,10 @@ def get_other_file(filename):
         return filename[0:-1] + 'c'
     raise NameError
 
-if __name__ == "__main__":
+def switch_file():
     try:
         other_file = get_other_file(vim.current.buffer.name)
-        if os.path.exists(other):
+        if os.path.exists(other_file):
             open_file(other_file)
         else:
             files = find_files_in_tags(other_file)
