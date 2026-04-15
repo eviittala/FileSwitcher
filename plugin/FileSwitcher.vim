@@ -1,5 +1,15 @@
 vim9script
 
+if !has("python3")
+    echom "vim has to be compiled with +python3 to run this"
+    finish
+endif
+
+if exists('fileSwitcherLoaded')
+    finish
+endif
+
+var fileSwitcherLoaded = 1
 var plugin_root_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
 python3 << EOF
