@@ -17,8 +17,8 @@ import sys
 from os.path import normpath, join
 import vim
 plugin_root_dir = vim.eval('plugin_root_dir')
-#python_root_dir = normpath(join(plugin_root_dir, '..', 'python'))
-sys.path.insert(0, plugin_root_dir)
+python_root_dir = normpath(join(plugin_root_dir, '..', 'python'))
+sys.path.insert(0, python_root_dir)
 import FileSwitcher as fs
 EOF
 
