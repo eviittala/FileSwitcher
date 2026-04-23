@@ -15,6 +15,10 @@ class TestFileSwitcher(unittest.TestCase):
     #    self.assertTrue(fs.exists('foo.cpp'))
     #    os.remove('foo.cpp')
     #    self.assertFalse(fs.exists('foo.cpp'))
+    def _create_file(self, path):
+        with open('tags', 'w') as file:
+            file.write("Main software/bar/Foo.cpp class Foo")
+
     def tearDown(self):
         if os.path.exists('tags'):
             os.remove('tags')
@@ -60,5 +64,15 @@ class TestFileSwitcher(unittest.TestCase):
         self.assertEqual('/tmp/bar/Foo.hpp', fs.get_other_file('/tmp/bar/Foo.cpp'))
         with self.assertRaises(NameError):
             fs.get_other_file('/tmp/bar/Foo.py')
+
+#    @patch('vim.current.buffer.name')
+#    @patch('os.path.exists')
+#    def test_get_files(self, mock_method1, mock_method2):
+#        mock_method1.return_value = 'Foo.cpp'
+#        mock_method2.return_value = True 
+#        files = fs.get_files()
+#        self.assertEqual(['Foo.hpp'], files)
+        
+        
 
 unittest.main()

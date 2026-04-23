@@ -53,3 +53,21 @@ def switch_file():
                 print("The file: " + filename + " is not found from tags")
     except NameError:
         print(f"Incompatible file: {vim.current.buffer.name}")
+
+def get_files():
+    try:
+        other_file = get_other_file(vim.current.buffer.name)
+        if os.path.exists(other_file):
+            #print(other_file)
+            #vim.command("g:files = '%s'"% other_file)
+            #vim.command("let g:files = 'Foo_bar.cpp'")
+            return [other_file]
+        else:
+            files = find_files_in_tags(other_file)
+            lfiles = list(files)
+            return lfiles
+            #if len(files) > 1:
+            #    files = ':'.join(files)
+            #return files
+    except NameError:
+        print(f"Incompatible file: {vim.current.buffer.name}")

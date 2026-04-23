@@ -23,7 +23,11 @@ import FileSwitcher as fs
 EOF
 
 def g:CallFileSwitcher(): void
-    py3 fs.switch_file()
+    var files = py3eval("fs.get_files()")
+    #g:files = 'Foo.hpp'
+    #echo g:files
+    #echo files
+    execute "edit " .. files[0]
 enddef
 
 nnoremap <leader>q :call CallFileSwitcher()<CR>
