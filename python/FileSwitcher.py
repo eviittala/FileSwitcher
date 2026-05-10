@@ -21,8 +21,8 @@ def find_files_in_tags(file):
             pass
         
         return set(files)
-    else:
-        print("tags -file is not found s")
+    #else:
+        #print("tags -file is not found s")
     return set()
 
 def open_file(path):
@@ -50,7 +50,9 @@ def switch_file():
             if 0 < len(files):
                 open_file(list(files)[0])
             else:
-                print("The file: " + filename + " is not found from tags")
+                errStrCmd = "echomsg The file: " + filename + " is not found from tags" 
+                vim.command(errStrCmd)
+                #print("The file: " + filename + " is not found from tags")
     except NameError:
         print(f"Incompatible file: {vim.current.buffer.name}")
 
@@ -71,3 +73,4 @@ def get_files():
             #return files
     except NameError:
         print(f"Incompatible file: {vim.current.buffer.name}")
+    return []
