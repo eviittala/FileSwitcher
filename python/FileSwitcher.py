@@ -4,6 +4,10 @@ import os
 def file_extension(path):
     return path.split('.')[-1]
 
+def printError(errStr):
+    cmd = f"echomsg \"{errStr}\""
+    vim.command(cmd)
+
 def find_files_in_tags(file):
     if os.path.exists('tags'):
         filename = os.path.basename(file)
@@ -21,7 +25,8 @@ def find_files_in_tags(file):
             pass
         
         return set(files)
-    #else:
+    else:
+        printError("tags -file is not found")
         #print("tags -file is not found s")
     return set()
 
@@ -40,21 +45,22 @@ def get_other_file(filename):
         return filename[0:-1] + 'c'
     raise NameError
 
-def switch_file():
-    try:
-        other_file = get_other_file(vim.current.buffer.name)
-        if os.path.exists(other_file):
-            open_file(other_file)
-        else:
-            files = find_files_in_tags(other_file)
-            if 0 < len(files):
-                open_file(list(files)[0])
-            else:
-                errStrCmd = "echomsg The file: " + filename + " is not found from tags" 
-                vim.command(errStrCmd)
-                #print("The file: " + filename + " is not found from tags")
-    except NameError:
-        print(f"Incompatible file: {vim.current.buffer.name}")
+# def switch_file():
+#     try:
+#         other_file = get_other_file(vim.current.buffer.name)
+#         if os.path.exists(other_file):
+#             open_file(other_file)
+#         else:
+#             files = find_files_in_tags(other_file)
+#             if 0 < len(files):
+#                 open_file(list(files)[0])
+#             else:
+#                 errStr =  f"\"The file: {filename} is not found from tags\""
+#                 errStrCmd = 'echomsg ' + errStr 
+#                 vim.command(errStrCmd)
+#                 print("The file: " + filename + " is not found from tags")
+#     except NameError:
+#         print(f"Incompatible file: {vim.current.buffer.name}")
 
 def get_files():
     try:
@@ -68,9 +74,6 @@ def get_files():
             files = find_files_in_tags(other_file)
             lfiles = list(files)
             return lfiles
-            #if len(files) > 1:
-            #    files = ':'.join(files)
-            #return files
     except NameError:
         print(f"Incompatible file: {vim.current.buffer.name}")
     return []

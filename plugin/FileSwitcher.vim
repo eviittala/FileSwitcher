@@ -27,30 +27,29 @@ var files: list<string>
 def OpenFile(file: string): void
     var txt: string = "Changing to " .. file
     echowindow txt
-    #echomsg txt
     execute "edit " .. file
     files = []
 enddef
 
 def SelectFile(id: number, result: number): void
-    echo result .. " " .. id
     OpenFile(files[result - 1])
 enddef
 
-def ShowDialog(file: string): void
-    var txt: string = "Changing to " .. file
-    popup_create(txt, {
-        \ line: 1,
-        \ col: 100,
-        \ minwidth: 20,
-        \ time: 3000,
-        \ tabpage: -1,
-        \ zindex: 300,
+def ShowDialog(): void
+    var pos = getpos('.')
+    popup_create(files, {
+        \ line: pos[1] + 1,
+        \ col: pos[2],
+        \ zindex: 200,
         \ drag: 1,
-        \ highlight: 'WarningMsg',
+        \ wrap: 0,
         \ border: [],
-        \ close: 'click',
-        \ padding: [0, 1, 0, 1], } )
+        \ cursorline: 1,
+        \ padding: [0, 1, 0, 1],
+        \ filter: 'popup_filter_menu',
+        \ mapping: 0,
+        \ callback: 'SelectFile',
+        \ })
 enddef
 
 def IsValidFile(file: string): bool
@@ -67,11 +66,7 @@ def g:CallFileSwitcher(): void
         files = py3eval("fs.get_files()")
         #echo files
         if 1 < len(files)
-            files->popup_menu({ callback: 'SelectFile' })
-            #var pos = getpos('.')
-            #popup_menu(files, {
-            #    \ callback: 'SelectFile',
-            #    \ })
+            ShowDialog()
         elseif 0 < len(files)
             OpenFile(files[0])
         elseif 0 == len(files)
