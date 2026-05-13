@@ -61,19 +61,18 @@ def IsValidFile(file: string): bool
 enddef
 
 def g:CallFileSwitcher(): void
-    var filename: string = expand('%')
-    if IsValidFile(filename)
+    var current_file: string = expand('%')
+    if IsValidFile(current_file)
         files = py3eval("fs.get_files()")
-        #echo files
         if 1 < len(files)
             ShowDialog()
         elseif 0 < len(files)
             OpenFile(files[0])
         elseif 0 == len(files)
-            echomsg "Cannot find switchable file for " .. filename
+            echomsg "Cannot find switchable file for " .. current_file
         endif
     else
-        echomsg "Not valid file: " .. filename
+        echomsg "Not valid file: " .. current_file
     endif
 enddef
 

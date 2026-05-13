@@ -9,46 +9,57 @@ import FileSwitcher as fs
 
 class TestFileSwitcher(unittest.TestCase):
 
-    #def test_exists(self):
-    #    with open('foo.cpp', 'w') as file:
-    #        file.write('Hello World')
-    #    self.assertTrue(fs.exists('foo.cpp'))
-    #    os.remove('foo.cpp')
-    #    self.assertFalse(fs.exists('foo.cpp'))
-    def _create_file(self, path):
-        with open('tags', 'w') as file:
-            file.write("Main software/bar/Foo.cpp class Foo")
+    def setUp(self):
+        self.temp_files = []
 
     def tearDown(self):
         if os.path.exists('tags'):
             os.remove('tags')
+        for file in self.temp_files:
+            if os.path.exists(file):
+                os.remove(file)
+
+    def _create_file(self, path):
+        self.temp_files.append(path)
+        with open(path, 'w') as file:
+            file.write("Test file")
+
+    def _add_text_to_tags(self, txt):
+        with open('tags', 'a') as file:
+            file.write(txt + "\n")
 
     def test_file_extension(self):
         self.assertEqual('cpp', fs.file_extension('foo.cpp'))
         self.assertEqual('hpp', fs.file_extension('foo.hpp'))
 
+    @patch('vim.command')
+    def test_print_error(self, mock_method):
+        str = "test Eero error"
+        fs.print_error(str)
+        mock_method.assert_called_with('echomsg "test Eero error"')
+
     def test_find_files_in_tags(self):
-        self.assertEqual(set(), fs.find_files_in_tags('Foo.cpp'))
+        self.assertEqual(list(), fs.find_files_in_tags('Foo.cpp'))
         self.assertTrue(0 == len(fs.find_files_in_tags('Foo.cpp')))
 
     def test_find_files_in_tags1(self):
-        with open('tags', 'w') as file:
-            file.write("Main software/bar/Foo.cpp class Foo")
-        self.assertEqual({'software/bar/Foo.cpp'}, fs.find_files_in_tags('Foo.cpp'))
+        self._add_text_to_tags("Main software/bar/Foo.cpp class Foo")
+        self.assertEqual(['software/bar/Foo.cpp'], fs.find_files_in_tags('Foo.cpp'))
 
     def test_find_files_in_tags2(self):
-        with open('tags', 'w') as file:
-            file.write("Main    software/bar/TestFoo.cpp    class Foo\n")
-            file.write("Main    software/bar/Foo.cpp    class Foo\n")
-        self.assertEqual({'software/bar/Foo.cpp'}, fs.find_files_in_tags('software/foo/Foo.cpp'))
+        self._add_text_to_tags("Main    software/bar/TestFoo.cpp    class Foo")
+        self._add_text_to_tags("Main    software/bar/Foo.cpp    class Foo")
+        self.assertEqual(['software/bar/Foo.cpp'], fs.find_files_in_tags('software/foo/Foo.cpp'))
 
     def test_find_files_in_tags3(self):
-        with open('tags', 'w') as file:
-            file.write("Main    software/tmp/Foo.cpp    class Foo\n")
-            file.write("Main    software/bar/TestFoo.cpp    class Foo\n")
-            file.write("Main    software/bar/Foo.cpp    class Foo\n")
-            file.write("Main    software/sys/Foo.cpp    class Foo\n")
-        self.assertEqual({'software/tmp/Foo.cpp', 'software/bar/Foo.cpp', 'software/sys/Foo.cpp'}, fs.find_files_in_tags('software/foo/Foo.cpp'))
+        self._add_text_to_tags("Main    software/tmp/Foo.cpp    class Foo")
+        self._add_text_to_tags("Main    software/bar/TestFoo.cpp    class Foo")
+        self._add_text_to_tags("Main    software/bar/Foo.cpp    class Foo")
+        self._add_text_to_tags("Main    software/sys/Foo.cpp    class Foo")
+        files = fs.find_files_in_tags('software/foo/Foo.cpp')
+        for file in ['software/tmp/Foo.cpp', 'software/sys/Foo.cpp', 'software/bar/Foo.cpp']:
+            if file not in files:
+                self.fail(f'File {file} cannot be found from files: {files}')
 
     @patch('vim.command')
     def test_open_file(self, mock_method):
@@ -62,17 +73,29 @@ class TestFileSwitcher(unittest.TestCase):
         self.assertEqual('Foo.c', fs.get_other_file('Foo.h'))
         self.assertEqual('/tmp/bar/Foo.h', fs.get_other_file('/tmp/bar/Foo.c'))
         self.assertEqual('/tmp/bar/Foo.hpp', fs.get_other_file('/tmp/bar/Foo.cpp'))
-        with self.assertRaises(NameError):
-            fs.get_other_file('/tmp/bar/Foo.py')
+        self.assertEqual(None, fs.get_other_file('/tmp/bar/Foo.py'))
 
-#    @patch('vim.current.buffer.name')
-#    @patch('os.path.exists')
-#    def test_get_files(self, mock_method1, mock_method2):
-#        mock_method1.return_value = 'Foo.cpp'
-#        mock_method2.return_value = True 
-#        files = fs.get_files()
-#        self.assertEqual(['Foo.hpp'], files)
-        
-        
+    @patch('FileSwitcher.get_current_buffer_name')
+    def test_get_files_none(self, mock_method):
+        mock_method.return_value = 'Foo.cpp'
+        self.assertEqual([], fs.get_files())
+
+    @patch('FileSwitcher.get_current_buffer_name')
+    def test_get_files_file_exists_hpp(self, mock_method):
+        self._create_file("Foo.hpp")
+        mock_method.return_value = 'Foo.cpp'
+        self.assertEqual(['Foo.hpp'], fs.get_files())
+
+    @patch('FileSwitcher.get_current_buffer_name')
+    def test_get_files_file_exists_cpp(self, mock_method):
+        self._create_file("Foo.cpp")
+        mock_method.return_value = 'Foo.hpp'
+        self.assertEqual(['Foo.cpp'], fs.get_files())
+
+    @patch('FileSwitcher.get_current_buffer_name')
+    def test_get_files_file_exists_in_tags(self, mock_method):
+        mock_method.return_value = 'Foo.hpp'
+        self._add_text_to_tags("Main software/bar/Foo.cpp class Foo")
+        self.assertEqual(['software/bar/Foo.cpp'], fs.get_files())
 
 unittest.main()
