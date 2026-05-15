@@ -1,4 +1,4 @@
- FileSwitcher.txt  A file switcher plugin to vim
+*FileSwitcher.txt*  A file switcher plugin to vim
  _____  _  _        ____            _  _         _                 ~
 |  ___|(_)| |  ___ / ___|__      __(_)| |_  ___ | |__    ___  _ __ ~
 | |_   | || | / _ \\___ \\ \ /\ / /| || __|/ __|| '_ \  / _ \| '__|~
@@ -7,11 +7,27 @@
 ==============================================================================
 CONTENTS                                                     *FileSwitcher-contents*
 
-    1.Intro...................................|FileSwitcher|
+    1. Intro...................................|FileSwitcher|
+    2. About...................................|FileSwitcherAbout|
+    3. License.................................|FileSwitcherLicense|
 
 ==============================================================================
-1. Intro                                                              *FileSwitcher*
+1. Intro							*FileSwitcher*
 
-One can easily swich between source and header file by pressing <leader>q
+FileSwitcher plugin for C/C++ projects.  One can easily switch between source
+and header file by pressing <leader>q
 ==============================================================================
+2. About							*FileSwitcherAbout*
 
+Issues can be reported to:
+https://github.com/eviittala/FileSwitcher/issues
+
+Eero Viittala
+eero.viittala@outlook.com
+==============================================================================
+3. License							*FileSwitcherLicense*
+
+No license
+
+------------------------------------------------------------------------------
+ vim:tw=78:ts=8:ft=help:noet:nospell
